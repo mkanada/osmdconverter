@@ -8,7 +8,8 @@ import java.util.*;
 
 public class DartGeneratorFromTSVisitor extends TypeScriptParserBaseVisitor<String> {
     OsmdConverter converter;
-    String fileName;
+    String fileName = "";
+    String currentClassName = "";
     private static Map<String, String> typeConversionMap = new HashMap<>();
     private static Map<String, String> dotMemberReplace = new HashMap<>();
 
@@ -307,16 +308,36 @@ public class DartGeneratorFromTSVisitor extends TypeScriptParserBaseVisitor<Stri
     public String visitClassDeclaration(TypeScriptParser.ClassDeclarationContext ctx) {
         String hiddenBefore = removeSpacesAfterNewLine(getHiddenTokens(ctx.classTail().start.getTokenIndex()));
         String className = visitIdentifier(ctx.identifier());
+        this.currentClassName = className;
         String block = visitClassTail(ctx.classTail());
         String heritage = visitChildren(ctx.classHeritage());
-        String identation = getIndentation(ctx.identifier().start.getLine());
-        return hiddenBefore + identation + "class " + className + " " + heritage + " " + block;
+        String indentation = getIndentation(ctx.identifier().start.getLine());
+        return hiddenBefore + indentation + "class " + className + " " + heritage + " " + block;
+    }
+
+    @Override
+    public String visitFormalParameterList(TypeScriptParser.FormalParameterListContext ctx) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ctx.formalParameterArg().size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(visitFormalParameterArg(ctx.formalParameterArg(i)));
+        }
+        return sb.toString();
     }
 
     @Override
     public String visitConstructorDeclaration(TypeScriptParser.ConstructorDeclarationContext ctx) {
-        //ctx.
-        return super.visitConstructorDeclaration(ctx);
+        // Create the constructor declaration in Dart, using the constructor name as the class name
+        String hiddenBefore = removeSpacesAfterNewLine(getHiddenTokens(ctx.start.getTokenIndex()));
+        String constructorName = this.currentClassName;
+        String constructorParameters = visitFormalParameterList(ctx.formalParameterList());
+        String constructorBody = visitChildren(ctx.functionBody());
+        String indentation = getIndentation(ctx.start.getLine());
+        return hiddenBefore + indentation + constructorName + "--(" + constructorParameters + ") {"
+                + constructorBody
+                + "\n" + indentation + "}";
     }
 
     @Override

@@ -117,6 +117,7 @@ public class OsmdConverter {
                     }
                     String originalFileName = file;
                     String newFileName = file.replace(".ts", ".xml");
+                    //String newFileName = file.replace(".ts", ".dart");
 
                     if (newFileName.indexOf(File.separatorChar) != -1) {
                         File dir = new File(outputDir, newFileName.substring(0, newFileName.lastIndexOf(File.separatorChar)));

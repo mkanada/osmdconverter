@@ -95,7 +95,7 @@ class Fraction  {
    * @param simplify - If simplify is true, then the fraction is simplified
    * to make both the numerator and denominator coprime, and less than maximumAllowedNumber.
    */
-  constructor(numerator: double = 0, denominator: double = 1, wholeValue: double = 0, simplify: bool = true) {
+  Fraction([this.double = 0],  denominator: double = 1,  wholeValue: double = 0,  simplify: bool = true) {
     this.numerator = numerator;
     this.denominator = denominator;
     this.wholeValue = wholeValue;
@@ -105,6 +105,7 @@ class Fraction  {
     }
     this.setRealValue();
   }
+  
 
   String toString() {
           String result =   this.numerator + "/" + this.denominator;
